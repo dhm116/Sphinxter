@@ -6,7 +6,7 @@ from threading import Thread
 from watchdog.observers import Observer
 from watchdog.events import *
 
-__all__ = ['']
+__all__ = ['Sphinxter']
 
 class Sphinxter(Thread, FileSystemEventHandler):
 	"""
