@@ -57,21 +57,18 @@ class Sphinxter(Thread, FileSystemEventHandler):
 
 	def on_created(self, event):
 		"""Triggered any time a new file/directory is created in a watched folder."""
-		self.logger.debug('{} was {}'.format(event.src_path, event.event_type))
 
-		self.__initiate_rebuild()
+		self.__initiate_rebuild(event)
 
 	def on_deleted(self, event):
 		"""Triggered any time a file/directory is deleted in a watched folder."""
-		self.logger.debug('{} was {}'.format(event.src_path, event.event_type))
 
-		self.__initiate_rebuild()
+		self.__initiate_rebuild(event)
 
 	def on_modified(self, event):
 		"""Triggered any time a file/directory is modified in a watched folder."""
-		self.logger.debug('{} was {}'.format(event.src_path, event.event_type))
 
-		self.__initiate_rebuild()
+		self.__initiate_rebuild(event)
 
 	def __observe_folder(self, folder):
 		"""Helper method for creating the :class:`watchdog.observers.Observer` instances
@@ -89,15 +86,17 @@ class Sphinxter(Thread, FileSystemEventHandler):
 		else:
 			self.logger.warn('{} is not a directory'.format(folder))
 
-	def __initiate_rebuild(self):
-		self.logger.info('Rebuilding sphinx documentation')
-		for type in self.make_formats:
-			self.logger.debug('Rebuilding documentation for "{}"'.format(type))
-			#self.logger.debug('{}/make {}'.format(os.getcwd(), type))
+	def __initiate_rebuild(self, event):
+		if 'build' not in event.src_path and '.pyc' not in event.src_path:
+			self.logger.debug('{} was {}'.format(event.src_path, event.event_type))
+			self.logger.info('Rebuilding sphinx documentation')
+			for type in self.make_formats:
+				self.logger.debug('Rebuilding documentation for "{}"'.format(type))
+				#self.logger.debug('{}/make {}'.format(os.getcwd(), type))
 
-			#os.chdir(os.getcwd())
+				#os.chdir(os.getcwd())
 
-			subprocess.call('{}\\make {}'.format(self.make_path, type), shell=True, stderr=subprocess.STDOUT)
+				subprocess.call('{}\\make {}'.format(self.make_path, type), shell=True, stderr=subprocess.STDOUT)
 
 	def __initiate_clean(self):
 		pass
